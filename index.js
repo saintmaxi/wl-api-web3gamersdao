@@ -2,6 +2,7 @@ const { MerkleTree } = require('merkletreejs')
 const keccak256 = require('keccak256')
 const { ethers } = require('ethers')
 const whitelist = require("./whitelist.json")
+const MAX_WL_QTY = 1;
 
 const hashedLeaves = whitelist.map(l => ethers.utils.solidityKeccak256(["address", "uint256"], [l.addr, l.qty]));
 
@@ -41,10 +42,10 @@ exports.handler = async function (event, context) {
     let proof;
     let lowercaseAddr = addr.toLowerCase();
     if (whitelist.some(e => e.addr === checksumAddr)) {
-      proof = await (getProof(checksumAddr));
+      proof = await (getProof({ addr: checksumAddr, qty: MAX_WL_QTY }));
     }
     else if (whitelist.some(e => e.addr === checksumAddr)) {
-      proof = await (getProof(lowercaseAddr));
+      proof = await (getProof({ addr: lowercaseAddr, qty: MAX_WL_QTY }));
     }
     else {
       return { statusCode: 200, headers: headers, body: "Not in whitelist", isBase64Encoded: false };
